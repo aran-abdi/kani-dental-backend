@@ -14,16 +14,16 @@ export class OtpService {
 
   /**
    * Mock OTP provider - logs the OTP and returns it
-   * In production, this would send OTP via SMS/Email
+   * In production, this would send OTP via SMS
    */
-  async sendOtp(email: string, otpCode: string): Promise<void> {
+  async sendOtp(phone: string, otpCode: string): Promise<void> {
     // Mock OTP provider - log it for development
-    this.logger.log(`[MOCK OTP] Sending OTP to ${email}`);
+    this.logger.log(`[MOCK OTP] Sending OTP to ${phone}`);
     this.logger.log(`[MOCK OTP] OTP Code: ${otpCode}`);
     this.logger.log(`[MOCK OTP] This OTP will expire in ${this.OTP_EXPIRY_MINUTES} minutes`);
 
-    // In production, you would integrate with an SMS/Email provider here
-    // Example: await this.smsProvider.send(email, `Your OTP code is: ${otpCode}`);
+    // In production, you would integrate with an SMS provider here
+    // Example: await this.smsProvider.send(phone, `Your OTP code is: ${otpCode}`);
   }
 
   /**

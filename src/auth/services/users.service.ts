@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { OtpService } from './otp.service';
+import { Messages } from '../../common/messages/messages';
 
 @Injectable()
 export class UsersService {
@@ -13,15 +14,15 @@ export class UsersService {
     private otpService: OtpService,
   ) {}
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByPhone(phone: string): Promise<User | null> {
     return this.usersRepository.findOne({
-      where: { email },
+      where: { phone },
       relations: ['clinic'],
     });
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.findByEmail(email);
+  async validateUser(phone: string, password: string): Promise<User | null> {
+    const user = await this.findByPhone(phone);
     if (!user) {
       return null;
     }
@@ -32,19 +33,19 @@ export class UsersService {
     }
 
     if (!user.isActive) {
-      throw new UnauthorizedException('User account is inactive');
+      throw new UnauthorizedException(Messages.AUTH.USER_INACTIVE);
     }
 
     return user;
   }
 
-  async requestPasswordReset(email: string): Promise<{ otpCode: string; expiresIn: number }> {
-    const user = await this.findByEmail(email);
+  async requestPasswordReset(phone: string): Promise<{ otpCode: string; expiresIn: number }> {
+    const user = await this.findByPhone(phone);
     if (!user) {
       // Don't reveal if user exists or not for security
       // Still generate and log OTP for mock purposes
       const otpCode = this.otpService.generateOtp();
-      await this.otpService.sendOtp(email, otpCode);
+      await this.otpService.sendOtp(phone, otpCode);
       return {
         otpCode,
         expiresIn: this.otpService.getOtpExpirySeconds(),
@@ -58,7 +59,7 @@ export class UsersService {
     user.otpExpiresAt = otpExpiresAt;
     await this.usersRepository.save(user);
 
-    await this.otpService.sendOtp(email, otpCode);
+    await this.otpService.sendOtp(phone, otpCode);
 
     return {
       otpCode,
@@ -66,18 +67,36 @@ export class UsersService {
     };
   }
 
-  async resetPassword(email: string, otpCode: string, newPassword: string): Promise<void> {
-    const user = await this.findByEmail(email);
+  async verifyOtp(phone: string, otpCode: string): Promise<boolean> {
+    const user = await this.findByPhone(phone);
     if (!user) {
-      throw new NotFoundException('User not found');
+      // Don't reveal if user exists or not for security
+      return false;
     }
 
     if (!user.otpCode || user.otpCode !== otpCode) {
-      throw new UnauthorizedException('Invalid OTP code');
+      return false;
     }
 
     if (!user.otpExpiresAt || this.otpService.isOtpExpired(user.otpExpiresAt)) {
-      throw new UnauthorizedException('OTP code has expired');
+      return false;
+    }
+
+    return true;
+  }
+
+  async resetPassword(phone: string, otpCode: string, newPassword: string): Promise<void> {
+    const user = await this.findByPhone(phone);
+    if (!user) {
+      throw new NotFoundException(Messages.AUTH.USER_NOT_FOUND);
+    }
+
+    if (!user.otpCode || user.otpCode !== otpCode) {
+      throw new UnauthorizedException(Messages.AUTH.INVALID_OTP);
+    }
+
+    if (!user.otpExpiresAt || this.otpService.isOtpExpired(user.otpExpiresAt)) {
+      throw new UnauthorizedException(Messages.AUTH.OTP_EXPIRED);
     }
 
     // Hash new password

@@ -11,7 +11,7 @@ export class AuthResponseDto {
   @ApiProperty({
     example: {
       id: '123e4567-e89b-12d3-a456-426614174000',
-      email: 'user@example.com',
+      phone: '+989123456789',
       firstName: 'John',
       lastName: 'Doe',
       clinicId: '123e4567-e89b-12d3-a456-426614174001',
@@ -25,7 +25,7 @@ export class AuthResponseDto {
   })
   user: {
     id: string;
-    email: string;
+    phone: string;
     firstName?: string;
     lastName?: string;
     clinicId: string;

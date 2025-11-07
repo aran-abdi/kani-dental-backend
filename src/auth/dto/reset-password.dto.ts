@@ -1,21 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
+import { Messages } from '../../common/messages/messages';
 
 export class ResetPasswordDto {
   @ApiProperty({
-    example: 'user@example.com',
-    description: 'User email address',
+    example: '+989123456789',
+    description: 'User phone number with +98 prefix',
   })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  @IsString({ message: Messages.AUTH.PHONE_REQUIRED })
+  @IsNotEmpty({ message: Messages.AUTH.PHONE_REQUIRED })
+  @Matches(/^\+98\d{10}$/, {
+    message: Messages.VALIDATION.PHONE_FORMAT,
+  })
+  phone: string;
 
   @ApiProperty({
     example: '123456',
-    description: 'OTP code received via email',
+    description: 'OTP code received via SMS',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: Messages.AUTH.OTP_REQUIRED })
+  @IsNotEmpty({ message: Messages.AUTH.OTP_REQUIRED })
   otpCode: string;
 
   @ApiProperty({
@@ -23,9 +27,9 @@ export class ResetPasswordDto {
     description: 'New password',
     minLength: 6,
   })
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(6)
+  @IsString({ message: Messages.AUTH.NEW_PASSWORD_REQUIRED })
+  @IsNotEmpty({ message: Messages.AUTH.NEW_PASSWORD_REQUIRED })
+  @MinLength(6, { message: Messages.VALIDATION.PASSWORD_MIN_LENGTH })
   newPassword: string;
 }
 

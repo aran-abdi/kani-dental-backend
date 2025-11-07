@@ -61,6 +61,10 @@ services:
         condition: service_healthy
     volumes:
       - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./nest-cli.json:/app/nest-cli.json
       - /app/node_modules
 
 volumes:

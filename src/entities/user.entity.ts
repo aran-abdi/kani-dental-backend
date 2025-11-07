@@ -6,7 +6,7 @@ import { ClinicRole } from '../common/enums/clinic-role.enum';
 @Entity('users')
 export class User extends BaseEntity {
   @Column({ unique: true })
-  email: string;
+  phone: string;
 
   @Column()
   password: string;
@@ -20,10 +20,10 @@ export class User extends BaseEntity {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   otpCode: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   otpExpiresAt: Date | null;
 
   @ManyToOne(() => Clinic, (clinic) => clinic.users, { nullable: false })

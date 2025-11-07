@@ -6,6 +6,8 @@ import { LoginDto } from './dto/login.dto';
 import { OtpResponseDto } from './dto/otp-response.dto';
 import { RequestOtpDto } from './dto/request-otp.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { Messages } from '../common/messages/messages';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -13,7 +15,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiOperation({ summary: 'Login with phone and password' })
   @ApiResponse({
     status: 200,
     description: 'Login successful',
@@ -21,7 +23,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto.email, loginDto.password);
+    return this.authService.login(loginDto.phone, loginDto.password);
   }
 
   @Post('request-otp')
@@ -33,13 +35,30 @@ export class AuthController {
   })
   async requestOtp(@Body() requestOtpDto: RequestOtpDto): Promise<OtpResponseDto> {
     const { otpCode, expiresIn } = await this.authService.requestPasswordReset(
-      requestOtpDto.email,
+      requestOtpDto.phone,
     );
     return {
       otpCode,
-      message: 'OTP sent successfully',
+      message: Messages.AUTH.OTP_SENT,
       expiresIn,
     };
+  }
+
+  @Post('verify-otp')
+  @ApiOperation({ summary: 'Verify OTP code' })
+  @ApiResponse({
+    status: 200,
+    description: 'OTP verified successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean', example: true },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Invalid or expired OTP' })
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.authService.verifyOtp(verifyOtpDto.phone, verifyOtpDto.otpCode);
   }
 
   @Post('reset-password')
@@ -58,7 +77,7 @@ export class AuthController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
-      resetPasswordDto.email,
+      resetPasswordDto.phone,
       resetPasswordDto.otpCode,
       resetPasswordDto.newPassword,
     );
