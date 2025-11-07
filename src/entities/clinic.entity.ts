@@ -19,6 +19,9 @@ export class Clinic extends BaseEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ type: 'timestamp', nullable: true })
+  expiryDate: Date | null;
+
   @OneToMany(() => User, (user) => user.clinic)
   users: User[];
 }

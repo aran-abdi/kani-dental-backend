@@ -8,8 +8,8 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   phone: string;
 
-  @Column()
-  password: string;
+  @Column({ type: 'varchar', nullable: true })
+  password: string | null;
 
   @Column({ nullable: true })
   firstName: string;
@@ -25,6 +25,12 @@ export class User extends BaseEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   otpExpiresAt: Date | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  invitationToken: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  invitationExpiresAt: Date | null;
 
   @ManyToOne(() => Clinic, (clinic) => clinic.users, { nullable: false })
   @JoinColumn({ name: 'clinicId' })

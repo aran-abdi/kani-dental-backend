@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
+import { SettingsModule } from './settings/settings.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 
@@ -24,6 +25,7 @@ import redisConfig from './config/redis.config';
     }),
     AuthModule,
     ProfileModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

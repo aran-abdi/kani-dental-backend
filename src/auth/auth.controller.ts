@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
@@ -7,12 +7,17 @@ import { OtpResponseDto } from './dto/otp-response.dto';
 import { RequestOtpDto } from './dto/request-otp.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { AcceptInvitationDto } from './dto/accept-invitation.dto';
 import { Messages } from '../common/messages/messages';
+import { SettingsService } from '../settings/settings.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly settingsService: SettingsService,
+  ) {}
 
   @Post('login')
   @ApiOperation({ summary: 'Login with phone and password' })
@@ -81,6 +86,55 @@ export class AuthController {
       resetPasswordDto.otpCode,
       resetPasswordDto.newPassword,
     );
+  }
+
+  @Get('invitation/:token')
+  @ApiOperation({ summary: 'Verify invitation token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invitation token is valid',
+    schema: {
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean', example: true },
+        user: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            clinic: { type: 'string' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Invalid or expired invitation token' })
+  async verifyInvitation(@Param('token') token: string) {
+    const user = await this.settingsService.verifyInvitationToken(token);
+    return {
+      valid: true,
+      user: {
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.phone,
+        clinic: user.clinic?.name,
+      },
+    };
+  }
+
+  @Post('accept-invitation')
+  @ApiOperation({ summary: 'Accept invitation and set password' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invitation accepted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Invitation accepted successfully' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid password or expired token' })
+  @ApiResponse({ status: 404, description: 'Invalid invitation token' })
+  async acceptInvitation(@Body() acceptDto: AcceptInvitationDto) {
+    return this.settingsService.acceptInvitation(acceptDto.token, acceptDto.password);
   }
 }
 
