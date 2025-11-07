@@ -35,6 +35,7 @@ export class AuthService {
               name: user.clinic.name,
             }
           : null,
+        avatarUrl: user.avatarUrl,
       },
     };
   }

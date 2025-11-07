@@ -34,6 +34,7 @@ export class AuthResponseDto {
       id: string;
       name: string;
     } | null;
+    avatarUrl?: string | null;
   };
 }
 

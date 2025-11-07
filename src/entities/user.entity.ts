@@ -39,5 +39,8 @@ export class User extends BaseEntity {
     default: ClinicRole.ASSISTANT,
   })
   role: ClinicRole;
+
+  @Column({ type: 'varchar', nullable: true })
+  avatarUrl: string | null;
 }
 

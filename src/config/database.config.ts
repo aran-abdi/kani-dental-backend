@@ -9,7 +9,7 @@ export default registerAs('database', () => ({
   database: process.env.DB_NAME || 'kani',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: process.env.NODE_ENV !== 'production',
-  logging: process.env.NODE_ENV === 'development',
+  // logging: process.env.NODE_ENV === 'development',
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 }));
 

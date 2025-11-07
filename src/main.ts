@@ -1,11 +1,18 @@
 import { ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Serve static files for uploads
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   // Enable CORS
   app.enableCors();
@@ -43,6 +50,7 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag('api')
     .addTag('auth', 'Authentication endpoints')
+    .addTag('profile', 'User profile endpoints')
     .addTag('app', 'Application endpoints')
     .build();
 
