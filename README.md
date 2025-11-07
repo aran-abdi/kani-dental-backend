@@ -31,6 +31,45 @@
 $ npm install
 ```
 
+## Environment Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+# Application
+NODE_ENV=development
+PORT=3000
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=kani
+DB_SSL=false
+```
+
+## Database Setup
+
+### Using Docker (Recommended)
+
+```bash
+# Start PostgreSQL and backend services
+$ npm run docker:up
+
+# View logs
+$ npm run docker:logs
+
+# Stop services
+$ npm run docker:down
+```
+
+### Manual Setup
+
+1. Install and start PostgreSQL
+2. Create a database named `kani` (or update `DB_NAME` in `.env`)
+3. Run the application
+
 ## Compile and run the project
 
 ```bash
@@ -42,6 +81,30 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+```
+
+## API Documentation
+
+Once the application is running, visit:
+- Swagger UI: http://localhost:3000/api
+
+## Docker Commands
+
+```bash
+# Build containers
+$ npm run docker:build
+
+# Start services
+$ npm run docker:up
+
+# Stop services
+$ npm run docker:down
+
+# View logs
+$ npm run docker:logs
+
+# Check running containers
+$ npm run docker:ps
 ```
 
 ## Run tests
