@@ -12,6 +12,7 @@ import {
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -34,7 +35,10 @@ if (!existsSync(uploadsDir)) {
 @Controller('patients')
 @UseGuards(JwtAuthGuard)
 export class PatientsController {
-  constructor(private readonly patientsService: PatientsService) {}
+  constructor(
+    private readonly patientsService: PatientsService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new patient' })
@@ -178,7 +182,7 @@ export class PatientsController {
     }
 
     // Construct the URL - in production, this should be your CDN or storage service URL
-    const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+    const baseUrl = this.configService.get<string>('API_BASE_URL') || process.env.API_BASE_URL || 'http://localhost:3000';
     const avatarUrl = `${baseUrl}/uploads/patients/${file.filename}`;
 
     return this.patientsService.updateAvatar(id, req.user.clinicId, avatarUrl);

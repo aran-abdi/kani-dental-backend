@@ -158,8 +158,7 @@ export class PatientsService {
       avatarUrl: patient.avatarUrl,
       createdAt: patient.createdAt,
       updatedAt: patient.updatedAt,
-      // TODO: Add lastVisit from sessions when session entity is created
-      lastVisit: null,
+      lastVisit: patient.lastVisit || null,
     };
   }
 }

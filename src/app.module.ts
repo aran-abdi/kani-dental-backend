@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { SettingsModule } from './settings/settings.module';
 import { PatientsModule } from './patients/patients.module';
+import { SessionsModule } from './sessions/sessions.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 
@@ -28,6 +29,7 @@ import redisConfig from './config/redis.config';
     ProfileModule,
     SettingsModule,
     PatientsModule,
+    SessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

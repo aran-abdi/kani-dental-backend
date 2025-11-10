@@ -95,3 +95,6 @@ public
 tmp/
 temp/
 
+# Uploaded files
+/uploads
+

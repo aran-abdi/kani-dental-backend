@@ -2,12 +2,14 @@ import { ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService);
 
   // Serve static files for uploads
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
@@ -57,7 +59,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  const port = process.env.PORT ?? 3000;
+  const port = parseInt(configService.get<string>('PORT') || '3000', 10);
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(`Swagger documentation: http://localhost:${port}/api`);

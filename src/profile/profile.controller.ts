@@ -11,6 +11,7 @@ import {
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -32,7 +33,10 @@ if (!existsSync(uploadsDir)) {
 @Controller('profile')
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get current user profile' })
@@ -112,7 +116,7 @@ export class ProfileController {
     }
 
     // Construct the URL - in production, this should be your CDN or storage service URL
-    const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+    const baseUrl = this.configService.get<string>('API_BASE_URL') || process.env.API_BASE_URL || 'http://localhost:3000';
     const avatarUrl = `${baseUrl}/uploads/avatars/${file.filename}`;
 
     return this.profileService.updateAvatar(req.user.id, avatarUrl);

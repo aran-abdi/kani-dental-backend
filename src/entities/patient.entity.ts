@@ -17,6 +17,9 @@ export class Patient extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   avatarUrl: string | null;
 
+  @Column({ type: 'timestamp', nullable: true })
+  lastVisit: Date | null;
+
   @ManyToOne(() => Clinic, { nullable: false })
   @JoinColumn({ name: 'clinicId' })
   clinic: Clinic;
