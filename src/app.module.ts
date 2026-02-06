@@ -8,6 +8,7 @@ import { ProfileModule } from './profile/profile.module';
 import { SettingsModule } from './settings/settings.module';
 import { PatientsModule } from './patients/patients.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { AIAssistantModule } from './ai-assistant/ai-assistant.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 
@@ -16,7 +17,6 @@ import redisConfig from './config/redis.config';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, redisConfig],
-      envFilePath: ['.env.local', '.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -30,6 +30,7 @@ import redisConfig from './config/redis.config';
     SettingsModule,
     PatientsModule,
     SessionsModule,
+    AIAssistantModule,
   ],
   controllers: [AppController],
   providers: [AppService],

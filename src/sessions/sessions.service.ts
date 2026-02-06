@@ -86,6 +86,22 @@ export class SessionsService {
     try {
       // Step 1: Transcribe audio
       const transcript = await this.transcriptionService.transcribeAudio(filePath);
+
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/cd1d72e5-f815-494e-9f6a-c3f375dc1a8f', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: 'debug-session',
+          runId: 'initial',
+          hypothesisId: 'H1',
+          location: 'src/sessions/sessions.service.ts:88',
+          message: 'SessionsService.transcribeAudioAsync transcript received',
+          data: { sessionId, transcriptLength: transcript?.length ?? 0 },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       
       // Update session with transcript
       let session = await this.sessionRepository.findOne({
@@ -103,13 +119,44 @@ export class SessionsService {
       // Step 2: Extract data from transcript
       try {
         const extractedData = await this.extractionService.extractDataFromTranscript(transcript);
-        
+
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/cd1d72e5-f815-494e-9f6a-c3f375dc1a8f', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'initial',
+            hypothesisId: 'H2',
+            location: 'src/sessions/sessions.service.ts:105',
+            message: 'SessionsService.transcribeAudioAsync extraction completed',
+            data: { sessionId, notesLength: extractedData?.length ?? 0 },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+        // #endregion
+
         // Update session with extracted data and mark as completed
         session.notes = extractedData;
         session.status = 'completed';
         await this.sessionRepository.save(session);
       } catch (extractionError) {
         console.error('Extraction error:', extractionError);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/cd1d72e5-f815-494e-9f6a-c3f375dc1a8f', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: 'debug-session',
+            runId: 'initial',
+            hypothesisId: 'H3',
+            location: 'src/sessions/sessions.service.ts:112',
+            message: 'SessionsService.transcribeAudioAsync extraction error',
+            data: { sessionId },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+        // #endregion
         // If extraction fails, still mark as completed with transcript
         // The transcript is available even if extraction failed
         session.status = 'completed';

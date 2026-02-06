@@ -36,45 +36,8 @@ services:
       retries: 5
       start_period: 5s
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: kani-backend
-    restart: unless-stopped
-    ports:
-      - "${PORT:-3001}:${PORT:-3001}"
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      PORT: ${PORT:-3001}
-      API_BASE_URL: ${API_BASE_URL:-http://localhost:3001}
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: ${DB_USERNAME:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_NAME: ${DB_NAME:-kani}
-      DB_SSL: ${DB_SSL:-false}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
-      GAPGPT_API_KEY: ${GAPGPT_API_KEY:-}
-      GAPGPT_BASE_URL: ${GAPGPT_BASE_URL:-https://api.gapgpt.app/v1}
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./src:/app/src
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./nest-cli.json:/app/nest-cli.json
-      - ./.env:/app/.env
-      - /app/node_modules
+  # Backend service will now run locally via npm instead of Docker.
+  # Keep only the database dependencies in Docker (postgres, redis).
 
 volumes:
   postgres_data:
